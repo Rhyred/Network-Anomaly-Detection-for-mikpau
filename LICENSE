@@ -374,16 +374,15 @@ that material) supplement the terms of this License with terms:
     reasonable ways as different from the original version; or
 
     d) Limiting the use for publicity purposes of names of licensors or
-    authors of the material; or
-
+    authors of the material;
     e) Declining to grant rights under trademark law for use of some
     trade names, trademarks, or service marks; or
 
     f) Requiring indemnification of licensors and authors of that
     material by anyone who conveys the material (or modified versions of
     it) with contractual assumptions of liability to the recipient, for
-    any liability that these contractual assumptions directly impose on
-    those licensors and authors.
+any liability that these contractual assumptions directly impose on
+those licensors and authors.
 
   All other non-permissive additional terms are considered "further
 restrictions" within the meaning of section 10.  If the Program as you
@@ -535,7 +534,7 @@ or that patent license was granted, prior to 28 March 2007.
 
   Nothing in this License shall be construed as excluding or limiting
 any implied license or other defenses to infringement that may
-otherwise be available to you under applicable patent law.
+otherwise be available to you under applicable law.
 
   12. No Surrender of Others' Freedom.
 
@@ -672,3 +671,29 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
+
+</final_file_content>
+
+IMPORTANT: For any future changes to this file, use the final_file_content shown above as your reference. This content reflects the current state of the file, including any auto-formatting (e.g., if you used single quotes but the formatter converted them to double quotes). Always base your SEARCH/REPLACE operations on this final version to ensure accuracy.
+
+<environment_details>
+# VSCode Visible Files
+netwok_monitoring_ai/LICENSE
+
+# VSCode Open Tabs
+landing_page.html
+LICENSE
+MikhPau/LICENSE
+DdosApi/requirements.txt
+DdosApi/app/main.py
+netwok_monitoring_ai/README.md
+netwok_monitoring_ai/requirements.txt
+netwok_monitoring_ai/LICENSE
+MikhPau/api/get_data.php
+
+# Recently Modified Files
+These files have been modified since you last accessed them (file was just edited so you may need to re-read it before editing):
+netwok_monitoring_ai/LICENSE
+
+# Current Time
+7/16/2025, 3:01:12 PM (Asia/Jakarta, UTC+7:00)

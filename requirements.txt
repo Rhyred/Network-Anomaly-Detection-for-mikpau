@@ -1,9 +1,8 @@
-pandas
-matplotlib
+# Dependencies untuk training model anomaly detktor
 numpy
+pandas
+scikit-learn
+torch
 jupyter
+matplotlib
 seaborn
-sklearn
-keras
-tensorflow
-scipy

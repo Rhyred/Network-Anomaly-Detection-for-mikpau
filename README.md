@@ -1,176 +1,109 @@
-***
+# AI-Powered Anomaly Detection for Network Traffic
 
-# Network-Anomaly-Detection
+This project provides a modular and reusable framework for detecting network anomalies, such as DDoS attacks, using a PyTorch-based Autoencoder model. It has been refactored from its original version to be more robust, flexible, and easier to integrate into other systems.
 
-This project aims to provide a setup for anomaly detection in Networking, specifically to detect DDoS attacks
+## Core Concepts
 
-<summary>Table of Contents</summary>
+The detection process is split into two main components, following standard MLOps practices:
 
-- [Network-Anomaly-Detection](#Network-Anomaly-Detection)
-  - [Introduction:](#Introduction)
-  - [Dependencies:](#dependencies)
-  - [Setup Instructions](#setup-instructions)
-  - [Train Dataset](#Train-Dataset:)
-  - [Results](#results)
-  - [Visualizing Data with TSNE:](#Visualizing-Data-Relationship-with-TSNE)
-  - [Future Work](#future-work)
+1.  **The "Kitchen" (`netwok_monitoring_ai/`):** This directory contains the core AI logic. It's where data is processed, models are trained, and the "intelligence" is built. The central piece is the `AnomalyDetector` class.
+2.  **The "Restaurant" (`DdosApi/`):** This is a web API (built with FastAPI) that "serves" the trained model. It receives live network traffic data, passes it to the trained model for a prediction, and returns the result.
 
+This separation ensures that the complex and resource-intensive training process is kept separate from the lightweight and fast prediction (inference) process.
 
-## Introduction
+## Key Components
 
+-   **`anomaly_detector.py`**: The heart of the project. This class encapsulates the entire ML workflow:
+    -   `preprocess_data()`: Converts raw network data (from MikroTik, etc.) into numerical features.
+    -   `train()`: Trains the Autoencoder and a simple classifier.
+    -   `predict()`: Makes predictions on new, live data.
+    -   `save_model()` / `load_model()`: Handles the persistence of all model components (Autoencoder, Classifier, Scaler).
 
-Many IoT devices are becoming victims of hackers due to their lack of security and they are often turned into botnets conducting Distributed Denial of Service (DDoS) attacks. We aim to detect those attacks by analyzing their network traffic. 
+-   **`ml_models/autoencoder_pytorch.py`**: A PyTorch implementation of the Autoencoder model, designed for efficiency and compatibility.
 
-When designing the model, one has to keep in mind that in a real life scenario, the attack detection is relevant only if it is conducted in a streaming/near real time way.
+-   **`checkpoints/`**: The directory where the trained models (`.pth` and `.pkl` files) are stored.
 
-We will create an autoencoder model in which we only show the model non-fraud cases. The model will try to learn the best representation of normal cases. The same model will be used to generate the representations of cases where a DDoS attack is done, and we expect them to be different from normal ones.
+## Workflow
 
-Create a network with one input layer and one output layer having identical dimentions ie. the shape of non-fraud cases. We will use keras package to craete our model.
+### 1. Data Collection
 
-![AutoEncoder](extra/autoencoder-net-arch.png) 
+The `DdosApi` is designed to automatically record all incoming traffic data into the `DdosApi/traffic_records/` directory. To build a dataset:
 
-The beauty of this approach is that we do not need too many samples of data for learning the good representations. We will use only 8000 rows of normal cases to train the autoencoder. Additionally, We do not need to run this model for a large number of epochs, running it for 10 epochs was sufficient.
+1.  Run the `DdosApi` server.
+2.  Run your main application (e.g., MikhPau) and let it send data to the API for a period of time under normal operating conditions.
+3.  This will create a collection of JSON files, which will serve as your "normal" dataset.
+4.  (Optional) If you can capture traffic during an anomaly or attack, save these files separately.
 
-Explanation: The choice of small samples from the original dataset is based on the intuition that one class characteristics (normal) will differ from that of the other (DDoS-attack). To distinguish these characteristics we need to show the autoencoders only one class of data. This is because the autoencoder will try to learn only one class and automaticlly distinuish the other class.
+### 2. Model Training (The "Kitchen")
 
-Once, the model is trained. We are intereseted in obtaining latent representation of the input learned by the model. This can be accessed by the weights of the trained model. We will create another network containing sequential layers, and we will only add the trained weights till the third layer where latent representation exists. Generate the hidden representations of two classes : normal and DDoS-Attack by predicting the raw inputs using the above model.
+This process should be done on a machine with the necessary dependencies installed (e.g., a development machine or a dedicated training server).
 
-Now, we can just train a simple linear classifier on the dataset. Or we can choose to train a multi-class clasifier, which can be another NN with softmax outputs for the number of classes!
+**a. Setup the Training Environment:**
 
-
-## Traditional Machine Learning-Based Approaches
-
-Below is a brief overview of popular machine learning-based techniques for anomaly detection.
-
-<b> a.Density-Based Anomaly Detection </b>
-Density-based anomaly detection is based on the k-nearest neighbors algorithm.
-
-Assumption: Normal data points occur around a dense neighborhood and abnormalities are far away.
-
-The nearest set of data points are evaluated using a score, which could be Eucledian distance or a similar measure dependent on the type of the data (categorical or numerical). They could be broadly classified into two algorithms:
-
-K-nearest neighbor: k-NN is a simple, non-parametric lazy learning technique used to classify data based on similarities in distance metrics such as Eucledian, Manhattan, Minkowski, or Hamming distance.
-
-Relative density of data: This is better known as local outlier factor (LOF). This concept is based on a distance metric called reachability distance.
-
-<b> b.Clustering-Based Anomaly Detection </b>
-Clustering is one of the most popular concepts in the domain of unsupervised learning.
-
-Assumption: Data points that are similar tend to belong to similar groups or clusters, as determined by their distance from local centroids.
-
-K-means is a widely used clustering algorithm. It creates 'k' similar clusters of data points. Data instances that fall outside of these groups could potentially be marked as anomalies.
-
-<b>c.Support Vector Machine-Based Anomaly Detection </b>
-A support vector machine is another effective technique for detecting anomalies.
-A SVM is typically associated with supervised learning, but there are extensions (OneClassCVM, for instance) that can be used to identify anomalies as an unsupervised problems (in which training data are not labeled).
-The algorithm learns a soft boundary in order to cluster the normal data instances using the training set, and then, using the testing instance, it tunes itself to identify the abnormalities that fall outside the learned region.
-
-In this project we are going to test the following Anomaly Detection Techniques namely
-
-- Isolation Forest Anomaly Detection Algorithm
-
-- Density-Based Anomaly Detection (Local Outlier Factor)Algorithm
-
-- Support Vector Machine Anomaly Detection Algorithm
-
-- <b>AutoEncoders for AnomalyDetection</b>
-
-
-
-## Results
-
-The below result was acheived with AutoEncoder method ![AutoEncoderResults](extra/autoencoder-results.png) 
-
-
-
-## Setup Instructions:
-#### 1. Requirements
-
-To reproduce the results from this repository, it is recommended to use virtual python environment and python version 3.6 Tensorflow version 2.3 was used to build the models. The project is tested only on Linux
-
-Follow these simple steps to setup the dependencies:
+It is highly recommended to use a Python virtual environment.
 
 ```shell
-git clone https://github.com/AkhilSinghRana/Network-Anomaly-Detection.git
+# Navigate to the network_monitoring_ai directory
+cd netwok_monitoring_ai
 
-cd Network-Anomaly-Detection/ 
+# Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Linux/macOS
+# .\venv\Scripts\Activate.ps1 # On Windows PowerShell
 
-virtualenv env_name -p python3
-
-source env_name/bin/activate #for linux
-
-
-pip install -e .
-
- ```
-
-Note*- The above code will setup all the required dependencies for you. Tested only on Linux
-
-
-You are now ready to train the models. I recommend to also browse through notebooks folder to understand the workflow a bit better.
-
-## 2. Data-Exploration:
-
-It is very important to understand the data before the model is constructed. You can go through the notbook DataExploration inside notebooks folder to check how the exploration was done and how data looks like.
-
-Some highlights from the notebook and how data exploration can benefit you in model creation is shown below.
-
-|Request Packet sent according to classes | Correlation matrix|
-|----------------|------------|
-|![TSNE](extra/packetSent.png) | ![Corr_matrix](extra/Corr_matrix.png)|
-
-
-
-
-## Train Dataset:
-
-Instructions for training on your own Dataset is shown in the notebook below. 
-
-Jupyter Notebook:
-
-``` jupyter notebook notebooks/Model_Training.ipynb  ```
- 
-Running from a Terminal:
-
-``` python main.py --help ```
-
-Sample training command, I assume that the csv files are stored inside data folder of the root project directory & the command is run from root_dir
-
-```shell
-
-python main.py --data_path data/data.csv --mode train
-
-
+# Install dependencies
+pip install -r requirements.txt 
 ```
-         
-  
-## Testing/Loading-checkpoints:
+*(Note: A `requirements.txt` for this specific training environment will be created next.)*
 
-Sample test command from root_dir 
+**b. Create a Training Script:**
 
-```shell
+Create a Python script (e.g., `train_model.py`) to orchestrate the training process. This script will:
+-   Load the collected JSON data from `DdosApi/traffic_records/`.
+-   Instantiate the `AnomalyDetector`.
+-   Call the `detector.train()` method with the loaded data.
 
-python main.py --data_path data/test.csv --mode test
+**Example `train_model.py`:**
+```python
+import os
+import json
+from anomaly_detector import AnomalyDetector
+
+def load_data_from_dir(dir_path):
+    all_data = []
+    for filename in os.listdir(dir_path):
+        if filename.endswith(".json"):
+            with open(os.path.join(dir_path, filename), 'r') as f:
+                all_data.append(json.load(f))
+    return all_data
+
+# Path to where MikhPau/DdosApi saved the data
+normal_data_path = '../DdosApi/traffic_records/'
+
+# Load the data
+print(f"Loading normal data from {normal_data_path}...")
+normal_data = load_data_from_dir(normal_data_path)
+
+if not normal_data:
+    print("No training data found. Exiting.")
+else:
+    # Initialize the detector
+    # It will save models to 'netwok_monitoring_ai/checkpoints/'
+    detector = AnomalyDetector(model_path='./checkpoints/')
+    
+    # Train the model
+    # We pass the normal data. The system will create synthetic anomalies for training the classifier.
+    detector.train(list_of_normal_data=normal_data, epochs=20)
+    
+    print("New model has been trained and saved in the checkpoints directory.")
 
 ```
 
-The above test command will take the test csv and pass through the autoencoder for creating latent representation of the test data, which then be passed through to the trained linear regression classifier
-         
-## Visualizing Data Relationship with TSNE:
+**c. Run the Training:**
+```shell
+python train_model.py
+```
 
-T-SNE (t-Distributed Stochastic Neighbor Embedding) is a dataset decomposition technique which reduced the dimentions of data and produces only top n components with maximum information.
+### 3. Deployment
 
-Every dot in the following represents a request. Normal transactions are represented as Green while potential attacks are represented as Red. The two axis are the components extracted by tsne.
-
-|TSNE on Normal scaled data vs | TSNE on embedded Latent representation|
-|----------------|------------|
-|![TSNE](extra/TSNE-1.png) | ![TSNE-1](extra/TSNE-embeddings.png)|
-
-
-## Future Work
-
-- Adding and training more models
-
-- further classifying different kinds of DDoS attacks!
-
-- Creating a semi-supervised loop to update models online while new data is being gathered.
+Once the models are trained and saved in the `netwok_monitoring_ai/checkpoints/` directory, the `DdosApi` is ready. Simply restart the `DdosApi` server. It will automatically load the new models on startup and begin providing real predictions.
