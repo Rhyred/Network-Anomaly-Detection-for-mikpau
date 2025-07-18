@@ -54,55 +54,22 @@ source venv/bin/activate  # On Linux/macOS
 # Install dependencies
 pip install -r requirements.txt 
 ```
-*(Note: A `requirements.txt` for this specific training environment will be created next.)*
+**b. Use the Training Notebook:**
 
-**b. Create a Training Script:**
+The recommended way to train is by using the provided Jupyter Notebook, which guides you through the process step-by-step.
 
-Create a Python script (e.g., `train_model.py`) to orchestrate the training process. This script will:
--   Load the collected JSON data from `DdosApi/traffic_records/`.
--   Instantiate the `AnomalyDetector`.
--   Call the `detector.train()` method with the loaded data.
+1.  **Start Jupyter Notebook:**
+    From your terminal (with the `venv` activated), run:
+    ```shell
+    python -m jupyter notebook
+    ```
+    Your web browser will open with the Jupyter interface.
 
-**Example `train_model.py`:**
-```python
-import os
-import json
-from anomaly_detector import AnomalyDetector
+2.  **Open and Run the Notebook:**
+    -   Click on the `Train_Model.ipynb` file.
+    -   Inside the notebook, execute each cell in order from top to bottom. You can do this by selecting a cell and pressing **Shift + Enter**.
 
-def load_data_from_dir(dir_path):
-    all_data = []
-    for filename in os.listdir(dir_path):
-        if filename.endswith(".json"):
-            with open(os.path.join(dir_path, filename), 'r') as f:
-                all_data.append(json.load(f))
-    return all_data
-
-# Path to where MikhPau/DdosApi saved the data
-normal_data_path = '../DdosApi/traffic_records/'
-
-# Load the data
-print(f"Loading normal data from {normal_data_path}...")
-normal_data = load_data_from_dir(normal_data_path)
-
-if not normal_data:
-    print("No training data found. Exiting.")
-else:
-    # Initialize the detector
-    # It will save models to 'netwok_monitoring_ai/checkpoints/'
-    detector = AnomalyDetector(model_path='./checkpoints/')
-    
-    # Train the model
-    # We pass the normal data. The system will create synthetic anomalies for training the classifier.
-    detector.train(list_of_normal_data=normal_data, epochs=20)
-    
-    print("New model has been trained and saved in the checkpoints directory.")
-
-```
-
-**c. Run the Training:**
-```shell
-python train_model.py
-```
+The notebook will handle loading the data, training the models, and saving the final artifacts (`autoencoder.pth`, `classifier.pkl`, `scaler.pkl`) into the `checkpoints/` directory.
 
 ### 3. Deployment
 

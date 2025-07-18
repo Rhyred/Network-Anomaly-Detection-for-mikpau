@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import MinMaxScaler
 
 # Menggunakan implementasi PyTorch yang baru
-from .ml_models import autoencoder_pytorch
+from ml_models import autoencoder_pytorch
 
 class AnomalyDetector:
     """
