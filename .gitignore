@@ -1,12 +1,16 @@
-# Ignore tracking of data
-data/*
-*.csv
-#ignore python virtual environment dependencies
-env/*
+# Python virtual environment
+venv/
 
-#Ignore cached project files
-.vscode*
-**__pycache__**
-**.egg-info
-**.ipynb_checkpoints/
+# Trained models - should not be in Git
 
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter Notebook checkpoints
+
+
+# IDE specific files
+.vscode/
+.idea/

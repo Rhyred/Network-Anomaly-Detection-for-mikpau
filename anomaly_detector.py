@@ -8,6 +8,11 @@ from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import MinMaxScaler
+import sys
+import os
+
+# Menambahkan path dari direktori saat ini ke sys.path agar impor modular berfungsi
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Menggunakan implementasi PyTorch yang baru
 from ml_models import autoencoder_pytorch
@@ -17,12 +22,19 @@ class AnomalyDetector:
     Sebuah class untuk membungkus seluruh alur kerja deteksi anomali,
     mulai dari pemrosesan data, pelatihan, hingga prediksi.
     """
-    def __init__(self, model_path='./checkpoints/'):
+    def __init__(self, model_path='checkpoints'):
         """
         Inisialisasi detector.
         :param model_path: Path untuk menyimpan atau memuat model.
         """
-        self.model_path = model_path
+        # Memastikan path adalah absolut
+        if not os.path.isabs(model_path):
+            # Membuat path absolut relatif terhadap file anomaly_detector.py ini
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            self.model_path = os.path.join(base_dir, model_path)
+        else:
+            self.model_path = model_path
+            
         self.autoencoder_model = None
         self.classifier_model = None
         self.scaler = MinMaxScaler()
@@ -199,7 +211,9 @@ class AnomalyDetector:
         probability = self.classifier_model.predict_proba(latent_rep)
         
         is_anomaly = bool(prediction[0] == 1)
-        confidence = float(probability[0][prediction[0]])
+        # Mengubah prediction[0] menjadi integer agar bisa digunakan sebagai indeks
+        confidence_index = int(prediction[0])
+        confidence = float(probability[0][confidence_index])
         
         return {
             "is_anomaly": is_anomaly,
